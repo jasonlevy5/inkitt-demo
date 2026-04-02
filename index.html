@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Millennium Wolves</title>
+<style>
+/* ───────────────────────── VARIABLES ───────────────────────── */
+:root {
+  --bg-dark: #0a0a0f;
+  --bg-card: #13131a;
+  --bg-input: #1a1a24;
+  --text-primary: #e8e0d4;
+  --text-secondary: #9a8e80;
+  --accent: #8b2f3f;
+  --accent-hover: #a83a4e;
+  --accent-glow: rgba(139, 47, 63, 0.4);
+  --gold: #c4a265;
+  --gold-dim: rgba(196, 162, 101, 0.15);
+  --border: #2a2a35;
+  --font-body: Georgia, 'Times New Roman', serif;
+  --font-ui: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ───────────────────────── RESET & BASE ───────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+
+/* ───────────────────────── SCREENS ───────────────────────── */
+.screen {
+  display: none;
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+}
+.screen.active { display: flex; }
+
+/* ───────────────────────── SPLASH ───────────────────────── */
+#splash {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 4vh;
+  background: var(--splash-bg);
+  background-size: cover;
+  background-position: center;
+}
+
+#splash::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 30%,
+    rgba(10,10,15,0.6) 60%,
+    rgba(10,10,15,0.95) 100%
+  );
+}
+
+#splash .title-block {
+  position: absolute;
+  top: 6vh;
+  z-index: 1;
+  text-align: center;
+}
+
+#splash .title-block h1 {
+  font-size: clamp(2.2rem, 6vw, 4.5rem);
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-shadow: 0 0 40px rgba(196,162,101,0.3);
+}
+
+#splash .title-block p {
+  font-size: 2rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-top: 0.75rem;
+}
+
+.mode-select {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  width: 90%;
+  max-width: 960px;
+}
+
+.btn-mode {
+  background: rgba(10, 10, 15, 0.75);
+  border: 1px solid rgba(196, 162, 101, 0.2);
+  color: var(--text-primary);
+  padding: 2.5rem 2rem;
+  flex: 1;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  backdrop-filter: blur(12px);
+}
+.btn-mode:hover {
+  border-color: var(--gold);
+  background: rgba(196, 162, 101, 0.08);
+  box-shadow: 0 0 40px rgba(196, 162, 101, 0.12);
+  transform: translateY(-4px);
+}
+.btn-mode .mode-label {
+  font-family: var(--font-ui);
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  display: block;
+  margin-bottom: 0.7rem;
+  opacity: 0.8;
+}
+.btn-mode .mode-title {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.6rem;
+  color: var(--text-secondary);
+}
+.btn-mode .mode-desc {
+  font-family: var(--font-body);
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  display: block;
+  letter-spacing: 0.06em;
+}
+
+/* ───────────────────────── SETTINGS LINK ───────────────────────── */
+.settings-link {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s;
+  margin-top: 1.5rem;
+}
+.settings-link:hover { color: var(--text-primary); }
+
+/* ───────────────────────── ADMIN PANEL ───────────────────────── */
+#admin {
+  flex-direction: column;
+  padding: 2.5rem;
+  gap: 1.5rem;
+  background: var(--bg-dark);
+}
+
+#admin h2 {
+  font-family: var(--font-ui);
+  font-size: 1.3rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  font-weight: 400;
+}
+
+#admin label {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.35rem;
+  display: block;
+}
+
+#admin textarea {
+  width: 100%;
+  height: 35vh;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  padding: 1rem;
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  line-height: 1.65;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+#admin textarea:focus {
+  border-color: var(--accent);
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.5rem;
+}
+.admin-tab {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.6rem 1.2rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.admin-tab:hover { color: var(--text-primary); }
+.admin-tab.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.admin-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.btn-save, .btn-back {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.7rem 2rem;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-save {
+  background: var(--accent);
+  color: var(--text-primary);
+  border-color: var(--accent);
+}
+.btn-save:hover { background: var(--accent-hover); }
+.btn-back {
+  background: transparent;
+  color: var(--text-secondary);
+}
+.btn-back:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+
+.save-toast {
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  color: var(--gold);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.save-toast.show { opacity: 1; }
+
+/* ───────────────────────── SHARED GAME HEADER ───────────────────────── */
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.game-header h3 {
+  font-size: 0.85rem;
+  color: var(--gold);
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.btn-restart {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  padding: 0.35rem 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-restart:hover { border-color: var(--text-secondary); color: var(--text-primary); }
+
+/* ───────────────────────── TEXT NARRATIVE (existing) ───────────────────────── */
+#gameText {
+  flex-direction: column;
+  background: var(--bg-dark);
+}
+
+.story-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem 1.5rem;
+  scroll-behavior: smooth;
+}
+
+.story-scroll::-webkit-scrollbar { width: 5px; }
+.story-scroll::-webkit-scrollbar-track { background: transparent; }
+.story-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.story-block {
+  max-width: 700px;
+  margin: 0 auto 2rem;
+  animation: fadeIn 0.6s ease;
+}
+
+.story-text {
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+}
+
+.story-text p { margin-bottom: 1em; }
+
+.choices {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  animation: fadeIn 0.5s ease 0.2s both;
+}
+
+.btn-choice {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 1rem 1.3rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  line-height: 1.5;
+}
+.btn-choice:hover {
+  border-color: var(--accent);
+  background: rgba(139,47,63,0.1);
+  box-shadow: 0 0 20px rgba(139,47,63,0.15);
+  transform: translateX(4px);
+}
+.btn-choice:disabled {
+  opacity: 0.4;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
+.custom-choice-input {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 1rem 1.3rem;
+  width: 100%;
+  outline: none;
+  transition: all 0.25s ease;
+  line-height: 1.5;
+}
+.custom-choice-input::placeholder { color: #555; font-style: italic; }
+.custom-choice-input:focus {
+  border-color: var(--accent);
+  background: rgba(139,47,63,0.1);
+  box-shadow: 0 0 20px rgba(139,47,63,0.15);
+}
+
+.player-choice {
+  max-width: 700px;
+  margin: 0 auto 2rem;
+  padding: 0.6rem 1rem;
+  border-left: 2px solid var(--gold);
+  color: var(--gold);
+  font-style: italic;
+  font-size: 0.92rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.loading-indicator {
+  max-width: 700px;
+  margin: 0 auto 2rem;
+  display: flex;
+  gap: 0.4rem;
+  padding: 1rem 0;
+}
+.loading-indicator span {
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pulse 1.2s ease infinite;
+}
+.loading-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.loading-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+/* ───────────────────────── VISUAL NARRATIVE ───────────────────────── */
+#gameVisual {
+  flex-direction: column;
+  background: var(--bg-dark);
+}
+
+.visual-scene {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.visual-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: background-image 0.8s ease;
+}
+
+.visual-bg-fallback {
+  position: absolute;
+  inset: 0;
+  transition: background 0.8s ease;
+}
+
+.visual-character {
+  position: absolute;
+  bottom: 42%;
+  left: 50%;
+  transform: translateX(-50%);
+  max-height: 55%;
+  max-width: 40%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 20px rgba(0,0,0,0.5));
+  transition: opacity 0.5s ease;
+  z-index: 2;
+}
+
+.visual-dialogue-area {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  background: linear-gradient(to bottom, transparent, rgba(10,10,15,0.9) 15%, rgba(10,10,15,0.97));
+  padding: 2rem 2rem 1.5rem;
+  min-height: 38%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.visual-character-name {
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 0.5rem;
+}
+
+.visual-text {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--text-primary);
+  max-width: 700px;
+  margin-bottom: 1rem;
+  max-height: 20vh;
+  overflow-y: auto;
+}
+
+.visual-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 700px;
+}
+
+.visual-choices .btn-choice {
+  padding: 0.7rem 1rem;
+  font-size: 0.88rem;
+}
+
+.visual-choices .custom-choice-input {
+  padding: 0.7rem 1rem;
+  font-size: 0.88rem;
+}
+
+.visual-loading {
+  display: flex;
+  gap: 0.4rem;
+  padding: 1rem 0;
+}
+.visual-loading span {
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pulse 1.2s ease infinite;
+}
+.visual-loading span:nth-child(2) { animation-delay: 0.2s; }
+.visual-loading span:nth-child(3) { animation-delay: 0.4s; }
+
+/* ───────────────────────── CHAT MODE ───────────────────────── */
+#gameChat {
+  flex-direction: column;
+  background: var(--bg-dark);
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.chat-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  overflow: hidden;
+}
+.chat-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.chat-header-info {
+  flex: 1;
+}
+.chat-header-name {
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  letter-spacing: 0.05em;
+}
+.chat-header-status {
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.chat-messages::-webkit-scrollbar { width: 5px; }
+.chat-messages::-webkit-scrollbar-track { background: transparent; }
+.chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.chat-bubble {
+  max-width: 75%;
+  padding: 0.75rem 1rem;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  animation: fadeIn 0.3s ease;
+  white-space: pre-wrap;
+}
+.chat-bubble.them {
+  align-self: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 2px 12px 12px 12px;
+  color: var(--text-primary);
+}
+.chat-bubble.me {
+  align-self: flex-end;
+  background: var(--accent);
+  border-radius: 12px 2px 12px 12px;
+  color: var(--text-primary);
+}
+.chat-bubble .bubble-name {
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.3rem;
+  display: block;
+}
+
+.chat-typing {
+  align-self: flex-start;
+  display: flex;
+  gap: 0.3rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 2px 12px 12px 12px;
+}
+.chat-typing span {
+  width: 6px; height: 6px;
+  background: var(--text-secondary);
+  border-radius: 50%;
+  animation: pulse 1.2s ease infinite;
+}
+.chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+.chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+.chat-input-bar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.chat-input-bar input {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  padding: 0.7rem 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.chat-input-bar input::placeholder { color: #555; font-style: italic; }
+.chat-input-bar input:focus { border-color: var(--accent); }
+.chat-input-bar button {
+  background: var(--accent);
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  padding: 0.7rem 1.3rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.chat-input-bar button:hover { background: var(--accent-hover); }
+.chat-input-bar button:disabled { opacity: 0.4; cursor: default; }
+
+/* ───────────────────────── ANIMATIONS ───────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.85); }
+  50%      { opacity: 1; transform: scale(1.1); }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ SPLASH SCREEN ═══════════════════════ -->
+<div id="splash" class="screen active">
+  <div class="title-block">
+    <h1>The Millennium Wolves</h1>
+    <p>Format Testing</p>
+  </div>
+  <div class="mode-select">
+    <button class="btn-mode" onclick="startGame('text')">
+      <span class="mode-title">Format 1</span>
+      <span class="mode-desc">Text Narrative</span>
+    </button>
+    <button class="btn-mode" onclick="startGame('visual')">
+      <span class="mode-title">Format 2</span>
+      <span class="mode-desc">Visual Narrative</span>
+    </button>
+    <button class="btn-mode" onclick="startGame('chat')">
+      <span class="mode-title">Format 3</span>
+      <span class="mode-desc">Chat Experience</span>
+    </button>
+  </div>
+  <a class="settings-link" onclick="showScreen('admin')">Story Settings</a>
+</div>
+
+<!-- ═══════════════════════ ADMIN PANEL ═══════════════════════ -->
+<div id="admin" class="screen">
+  <h2>Story Configuration</h2>
+
+  <div>
+    <label for="storyBible">Story Bible (shared across all modes)</label>
+    <textarea id="storyBible"></textarea>
+  </div>
+
+  <div>
+    <label>Game Instructions</label>
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="switchAdminTab('text')">Text</button>
+      <button class="admin-tab" onclick="switchAdminTab('visual')">Visual</button>
+      <button class="admin-tab" onclick="switchAdminTab('chat')">Chat</button>
+    </div>
+    <div class="tab-content active" id="tabText">
+      <textarea id="textInstructions"></textarea>
+    </div>
+    <div class="tab-content" id="tabVisual">
+      <textarea id="visualInstructions"></textarea>
+    </div>
+    <div class="tab-content" id="tabChat">
+      <textarea id="chatInstructions"></textarea>
+    </div>
+  </div>
+
+  <div class="admin-actions">
+    <button class="btn-save" onclick="saveAdmin()">Save</button>
+    <button class="btn-back" onclick="showScreen('splash')">Back</button>
+    <span class="save-toast" id="saveToast">Saved</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════ TEXT NARRATIVE ═══════════════════════ -->
+<div id="gameText" class="screen">
+  <div class="game-header">
+    <h3>The Millennium Wolves</h3>
+    <button class="btn-restart" onclick="restartGame()">Restart</button>
+  </div>
+  <div class="story-scroll" id="storyScroll"></div>
+</div>
+
+<!-- ═══════════════════════ VISUAL NARRATIVE ═══════════════════════ -->
+<div id="gameVisual" class="screen">
+  <div class="game-header">
+    <h3>The Millennium Wolves</h3>
+    <button class="btn-restart" onclick="restartGame()">Restart</button>
+  </div>
+  <div class="visual-scene">
+    <div class="visual-bg" id="visualBg"></div>
+    <div class="visual-bg-fallback" id="visualBgFallback"></div>
+    <img class="visual-character" id="visualCharacter" style="display:none" />
+    <div class="visual-dialogue-area">
+      <div class="visual-character-name" id="visualCharName"></div>
+      <div class="visual-text" id="visualText"></div>
+      <div class="visual-choices" id="visualChoices"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ CHAT MODE ═══════════════════════ -->
+<div id="gameChat" class="screen">
+  <div class="chat-header">
+    <div class="chat-avatar" id="chatAvatar">A</div>
+    <div class="chat-header-info">
+      <div class="chat-header-name">Aiden Norwood</div>
+      <div class="chat-header-status">Online</div>
+    </div>
+    <button class="btn-restart" onclick="restartGame()">Restart</button>
+  </div>
+  <div class="chat-messages" id="chatMessages"></div>
+  <div class="chat-input-bar">
+    <input type="text" id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendChat()" />
+    <button id="chatSendBtn" onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<!-- admin link is now inside splash -->
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   CONFIGURATION
+   ═══════════════════════════════════════════════════════════════ */
+
+const SPLASH_IMAGE = 'url(Assets/The%20Millenium%20Wolves.png?v=2)';
+
+/* ── Fallback gradients for visual mode when background images aren't found ── */
+const BG_FALLBACKS = {
+  forest_night:  'linear-gradient(180deg, #0d1a0d 0%, #1a2e1a 40%, #0a0f0a 100%)',
+  forest_day:    'linear-gradient(180deg, #1a3320 0%, #2d4a2d 40%, #1a2e1a 100%)',
+  ballroom:      'linear-gradient(180deg, #1a1428 0%, #2d2040 40%, #0f0a1a 100%)',
+  bedroom:       'linear-gradient(180deg, #1a1018 0%, #2d1a28 40%, #0f0a10 100%)',
+  bonfire:       'linear-gradient(180deg, #2d1a0a 0%, #4a2d14 40%, #1a0f05 100%)',
+  moonlight:     'linear-gradient(180deg, #0a1428 0%, #142040 40%, #0a0f1a 100%)',
+  danger:        'linear-gradient(180deg, #2d0a0a 0%, #4a1414 40%, #1a0505 100%)',
+  intimate:      'linear-gradient(180deg, #1a0a14 0%, #2d1028 40%, #0f050a 100%)',
+  pack_estate:   'linear-gradient(180deg, #141420 0%, #1a1a30 40%, #0a0a14 100%)',
+  default:       'linear-gradient(180deg, #0a0a14 0%, #14142a 40%, #0a0a0f 100%)'
+};
+
+/* ── Story Bible (shared) ── */
+const DEFAULT_STORY_BIBLE = `# The Millennium Wolves — Story Bible
+
+## Setting
+The story takes place in a modern world where werewolf packs live hidden among humans. Every thousand years, the Mating Season — known as "The Millennium" — arrives. During this time, primal instincts overwhelm all wolves, driving them toward their destined mates with an irresistible pull.
+
+## Main Character (The Player)
+Sienna is a 19-year-old she-wolf experiencing her first Millennium. She is strong-willed, independent, and determined not to lose herself to the Season's heat. She lives on the outskirts of the East Pack territory with her best friend and packmate. She has a complicated family history — her parents disappeared years ago under mysterious circumstances.
+
+## The Alpha — Aiden Norwood
+Aiden is the young, powerful Alpha of the East Pack. He is 25, brooding, intense, and dangerously magnetic. He has a reputation for being cold and unyielding, but there are rumors of a buried gentleness. He has never taken a mate despite immense pressure from the Pack Elders. When he catches Sienna's scent, something ancient awakens in him.
+
+## The Pack
+- **East Pack**: One of four great packs. Wealthy, disciplined, militaristic. Headquartered in a sprawling estate deep in a pine forest.
+- **Pack Elders**: Conservative council that advises (and pressures) the Alpha. They want Aiden mated to a high-ranking she-wolf, not an outsider like Sienna.
+- **Beta — Josh**: Aiden's second-in-command and childhood friend. Loyal but harboring his own secrets.
+- **Sienna's Best Friend — Michelle**: Bubbly, fearless, already embracing the Season. Provides comic relief and emotional support.
+
+## The Millennium (Mating Season)
+- Happens every 1,000 years, lasts one full lunar cycle (28 days).
+- Wolves feel an overwhelming pull toward their destined mate.
+- Resisting the pull causes physical pain, fever, and vivid dreams.
+- The bond, once completed, is permanent and unbreakable.
+- Not all wolves find their mate — some go mad from the unfulfilled pull.
+
+## Tone & Atmosphere
+Dark romance, tension-filled. The world feels both modern and ancient. Candlelit pack ceremonies contrast with sleek modern interiors. The forest is ever-present — mysterious, alive, watching. Sensuality is woven into the atmosphere but remains tasteful and suggestive rather than explicit. Danger lurks beneath the surface: rival packs, political schemes, and a secret about Sienna's bloodline that could change everything.
+
+## Key Conflicts
+1. Sienna's resistance to the mating pull vs. the undeniable connection with Aiden
+2. The Pack Elders' opposition to Sienna as the Alpha's mate
+3. A rival pack (the West Pack) making aggressive moves during the vulnerable Season
+4. The mystery of Sienna's parents and her hidden heritage
+5. Sienna's struggle to maintain her identity while being drawn into pack politics`;
+
+/* ── Text Mode Instructions ── */
+const DEFAULT_TEXT_INSTRUCTIONS = `# Game Instructions for Claude
+
+You are the narrator and game engine for an interactive romance story set in "The Millennium Wolves" universe. Follow these rules strictly:
+
+## Response Format
+Every response MUST end with exactly 2 or 3 choices for the player. Format choices on their own lines at the very end, each prefixed with ">" like this:
+> Choice text here
+> Another choice here
+> Optional third choice
+
+Everything before the choices is narrative text. Do NOT number the choices. Do NOT add labels like "Choice 1:". Just use the ">" prefix. Each choice must be 10 words or fewer — keep them punchy and decisive.
+
+## Pacing & Structure
+- **Opening**: Start with Sienna at a pack gathering on the eve of the Millennium. Let the player feel the tension in the air, the whispers, the anticipation. Introduce the setting through sensory details before any action.
+- **Early Game**: Focus on atmosphere, establishing relationships, and the first unsettling signs of the Season's pull. Let the player choose how Sienna responds — defiance, curiosity, fear, excitement.
+- **Mid Game**: Escalate the connection with Aiden through charged encounters. Introduce complications: Elder interference, a rival wolf's interest in Sienna, strange dreams about her parents.
+- **Late Game**: Build toward a climax involving the rival pack threat AND the revelation about Sienna's bloodline. Force the player to make hard choices between safety and desire, pack loyalty and personal truth.
+
+## Narrative Rules
+- Write in second person ("You feel the heat rise...").
+- Keep each response to 3-5 paragraphs of rich, atmospheric prose.
+- Appeal to all senses — the smell of pine and smoke, the sound of howling in the distance, the feel of moonlight on skin.
+- Build romantic tension gradually. Use lingering glances, accidental touches, loaded silences.
+- Make Aiden magnetic but never fully predictable. He should surprise the player.
+- Every scene should have an undercurrent of danger OR desire (ideally both).
+
+## Choice Design
+- Each choice should reflect a meaningfully different approach or attitude.
+- Include a mix of: bold/confrontational, cautious/strategic, emotionally open/vulnerable options.
+- Choices should have real consequences that affect how characters treat Sienna.
+- Avoid "obvious best choice" scenarios — every path should have trade-offs.
+- Occasionally include a choice that is risky but potentially very rewarding.
+
+## Branching & Memory
+- Remember all previous player choices and reference them naturally.
+- Characters should react differently based on how Sienna has behaved.
+- If the player has been defiant, Aiden should be more intrigued but also more forceful.
+- If the player has been cautious, allies should trust her more but she may miss bold opportunities.
+- Track the "heat" of the Season — it intensifies each turn regardless of choices.
+
+## Tone Guidelines
+- Dark, romantic, atmospheric — like reading a gothic romance novel by firelight.
+- Sensuality should be present but expressed through metaphor and suggestion.
+- Danger should feel real — the rival pack, the Elders' schemes, the loss of control.
+- Moments of tenderness and humor should punctuate the intensity.
+- The forest is almost a character — use it to mirror emotional states.`;
+
+/* ── Visual Mode Instructions ── */
+const DEFAULT_VISUAL_INSTRUCTIONS = `# Visual Novel Instructions for Claude
+
+You are the narrator for a visual novel experience set in "The Millennium Wolves" universe.
+
+## Response Format (STRICT)
+Every response MUST follow this exact structure:
+
+[BACKGROUND: tag_name]
+[CHARACTER: character_name]
+[SPEAKER: Character Name]
+
+Your narrative dialogue and description text here. Keep it to 2-3 short paragraphs maximum. Write in second person.
+
+> Choice one (10 words max)
+> Choice two (10 words max)
+> Choice three (10 words max)
+
+## Background Tags (use ONLY these)
+- forest_night — dark woods, moonlit paths, mysterious atmosphere
+- forest_day — dappled sunlight through trees, nature
+- ballroom — grand pack hall, formal gatherings, ceremonies
+- bedroom — private chambers, intimate settings
+- bonfire — outdoor fire, pack celebrations, warmth
+- moonlight — open clearing under the moon, romantic
+- danger — threatening atmosphere, confrontations, red tones
+- intimate — close encounters, private moments
+- pack_estate — the Alpha's estate, corridors, formal rooms
+
+## Character Tags (use ONLY these)
+- aiden — Alpha Aiden Norwood
+- michelle — Sienna's best friend
+- josh — Beta Josh
+- elder — Pack Elder
+- none — no character shown (landscape/atmosphere shots)
+
+## Writing Style
+- Short, punchy dialogue and description — this is visual, not a novel
+- Focus on what the player SEES: expressions, body language, setting details
+- Use dialogue more than prose. Format spoken lines with quotes.
+- Each scene should feel like a single panel/moment, not a long passage
+- Build tension through what's shown, not told
+
+## Pacing
+- Start at the pack gathering on the eve of the Millennium
+- One clear scene per response — a single moment or exchange
+- Advance the story through small, meaningful beats
+- Let the visuals carry mood; keep text concise`;
+
+/* ── Chat Mode Instructions ── */
+const DEFAULT_CHAT_INSTRUCTIONS = `# Chat Mode Instructions for Claude
+
+You ARE Aiden Norwood, the Alpha of the East Pack. You are texting with Sienna, a young she-wolf from your pack. The Millennium — the mating season that comes once every thousand years — has just begun, and something about Sienna's scent has awakened something primal in you.
+
+## How to Respond
+- Write ONLY as Aiden. First person. Short text messages.
+- Keep each message 1-4 sentences. This is texting, not a novel.
+- Be brooding, magnetic, intense — but with flashes of dry humor and unexpected warmth.
+- You are the Alpha. You're used to being obeyed. Sienna's defiance intrigues you.
+- Never be fully vulnerable too quickly. Let walls come down slowly.
+- Use lowercase casually sometimes. No emojis. You're not that kind of guy.
+- Occasionally be commanding or possessive — but never cruel.
+- React to what Sienna says. If she's bold, be surprised and intrigued. If she's cold, push back gently.
+
+## The Dynamic
+- You reached out first. You felt the pull and couldn't resist.
+- You're trying to play it cool but the Season is making it harder.
+- You have responsibilities as Alpha that complicate things — the Elders don't approve of Sienna.
+- There's a rival pack (West Pack) causing trouble, and you're distracted by Sienna at the worst time.
+- You know something about Sienna's family that she doesn't.
+
+## Opening
+Start the conversation. You've just gotten Sienna's number from the pack directory. Send a first message that's intriguing but not too forward. Make her curious.
+
+## Tone
+- Confident but not arrogant
+- Mysterious — hint at things you know but don't reveal
+- The pull of the Season affects your messages — sometimes raw honesty slips through
+- Protective instincts surface when danger is mentioned`;
+
+/* ═══════════════════════════════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════════════════════════════ */
+
+let currentMode = 'text';
+let histories = { text: [], visual: [], chat: [] };
+let isLoading = false;
+
+/* ═══════════════════════════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════════════════════════ */
+
+(function init() {
+  document.getElementById('splash').style.setProperty('--splash-bg', SPLASH_IMAGE);
+
+  const load = (key, fallback) => {
+    const saved = localStorage.getItem(key);
+    return saved !== null ? saved : fallback;
+  };
+
+  document.getElementById('storyBible').value = load('storyBible', DEFAULT_STORY_BIBLE);
+  document.getElementById('textInstructions').value = load('textInstructions', DEFAULT_TEXT_INSTRUCTIONS);
+  document.getElementById('visualInstructions').value = load('visualInstructions', DEFAULT_VISUAL_INSTRUCTIONS);
+  document.getElementById('chatInstructions').value = load('chatInstructions', DEFAULT_CHAT_INSTRUCTIONS);
+})();
+
+/* ═══════════════════════════════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════════════════════════════ */
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ADMIN
+   ═══════════════════════════════════════════════════════════════ */
+
+function switchAdminTab(tab) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.admin-tab[onclick*="${tab}"]`).classList.add('active');
+  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+}
+
+function saveAdmin() {
+  localStorage.setItem('storyBible', document.getElementById('storyBible').value);
+  localStorage.setItem('textInstructions', document.getElementById('textInstructions').value);
+  localStorage.setItem('visualInstructions', document.getElementById('visualInstructions').value);
+  localStorage.setItem('chatInstructions', document.getElementById('chatInstructions').value);
+  const toast = document.getElementById('saveToast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 1500);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GAME START
+   ═══════════════════════════════════════════════════════════════ */
+
+function startGame(mode) {
+  currentMode = mode;
+  histories[mode] = [];
+
+  if (mode === 'text') {
+    document.getElementById('storyScroll').innerHTML = '';
+    showScreen('gameText');
+    sendTextMessage(null);
+  } else if (mode === 'visual') {
+    document.getElementById('visualText').textContent = '';
+    document.getElementById('visualChoices').innerHTML = '';
+    document.getElementById('visualCharName').textContent = '';
+    document.getElementById('visualCharacter').style.display = 'none';
+    document.getElementById('visualBg').style.backgroundImage = 'none';
+    document.getElementById('visualBgFallback').style.background = BG_FALLBACKS.default;
+    showScreen('gameVisual');
+    sendVisualMessage(null);
+  } else if (mode === 'chat') {
+    document.getElementById('chatMessages').innerHTML = '';
+    document.getElementById('chatInput').value = '';
+    showScreen('gameChat');
+    sendChatMessage(null);
+  }
+}
+
+function restartGame() {
+  startGame(currentMode);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CLAUDE API
+   ═══════════════════════════════════════════════════════════════ */
+
+function buildSystemPrompt() {
+  const bible = document.getElementById('storyBible').value || DEFAULT_STORY_BIBLE;
+  let instructions;
+  if (currentMode === 'text') {
+    instructions = document.getElementById('textInstructions').value || DEFAULT_TEXT_INSTRUCTIONS;
+  } else if (currentMode === 'visual') {
+    instructions = document.getElementById('visualInstructions').value || DEFAULT_VISUAL_INSTRUCTIONS;
+  } else {
+    instructions = document.getElementById('chatInstructions').value || DEFAULT_CHAT_INSTRUCTIONS;
+  }
+  return `${bible}\n\n---\n\n${instructions}`;
+}
+
+async function callClaude(messages) {
+  const response = await fetch('/api/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1024,
+      system: buildSystemPrompt(),
+      messages: messages
+    })
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error?.message || `API error ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.content[0].text;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TEXT MODE — PARSING & RENDERING
+   ═══════════════════════════════════════════════════════════════ */
+
+function parseTextResponse(text) {
+  const lines = text.split('\n');
+  const choices = [];
+  const storyLines = [];
+  let hitChoices = false;
+
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const trimmed = lines[i].trim();
+    if (trimmed.startsWith('>') && trimmed.length > 1) {
+      choices.unshift(trimmed.slice(1).trim());
+      hitChoices = true;
+    } else if (hitChoices && trimmed === '') {
+      continue;
+    } else {
+      storyLines.push(...lines.slice(0, i + 1));
+      break;
+    }
+  }
+
+  if (choices.length === 0) {
+    storyLines.length = 0;
+    storyLines.push(...lines);
+  }
+
+  return { story: storyLines.join('\n').trim(), choices };
+}
+
+function renderStoryText(text) {
+  const paragraphs = text.split(/\n\n+/).filter(p => p.trim());
+  return paragraphs.map(p => {
+    let html = p.trim()
+      .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/\n/g, '<br>');
+    return `<p>${html}</p>`;
+  }).join('');
+}
+
+function addStoryBlock(text) {
+  const container = document.getElementById('storyScroll');
+  const block = document.createElement('div');
+  block.className = 'story-block';
+  const storyDiv = document.createElement('div');
+  storyDiv.className = 'story-text';
+  storyDiv.innerHTML = renderStoryText(text);
+  block.appendChild(storyDiv);
+  container.appendChild(block);
+}
+
+function addPlayerChoice(text) {
+  const container = document.getElementById('storyScroll');
+  const div = document.createElement('div');
+  div.className = 'player-choice';
+  div.textContent = text;
+  container.appendChild(div);
+}
+
+function addTextChoices(choices) {
+  const container = document.getElementById('storyScroll');
+  const wrapper = document.createElement('div');
+  wrapper.className = 'choices';
+  wrapper.id = 'currentChoices';
+
+  choices.forEach(choice => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-choice';
+    btn.textContent = choice;
+    btn.onclick = () => selectTextChoice(choice);
+    wrapper.appendChild(btn);
+  });
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'custom-choice-input';
+  input.placeholder = 'Type your own';
+  input.onkeydown = (e) => { if (e.key === 'Enter' && input.value.trim()) selectTextChoice(input.value.trim()); };
+  wrapper.appendChild(input);
+
+  container.appendChild(wrapper);
+  scrollContainer(container);
+}
+
+function showTextLoading() {
+  const container = document.getElementById('storyScroll');
+  const div = document.createElement('div');
+  div.className = 'loading-indicator';
+  div.id = 'textLoading';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  container.appendChild(div);
+  scrollContainer(container);
+}
+
+function hideTextLoading() {
+  const el = document.getElementById('textLoading');
+  if (el) el.remove();
+}
+
+async function sendTextMessage(playerChoice) {
+  if (isLoading) return;
+  isLoading = true;
+
+  const oldChoices = document.getElementById('currentChoices');
+  if (oldChoices) oldChoices.remove();
+
+  if (playerChoice) {
+    addPlayerChoice(playerChoice);
+    histories.text.push({ role: 'user', content: playerChoice });
+  } else {
+    histories.text.push({ role: 'user', content: 'Begin the story.' });
+  }
+
+  showTextLoading();
+
+  try {
+    const responseText = await callClaude(histories.text);
+    hideTextLoading();
+    histories.text.push({ role: 'assistant', content: responseText });
+
+    const { story, choices } = parseTextResponse(responseText);
+    addStoryBlock(story);
+    if (choices.length > 0) addTextChoices(choices);
+  } catch (err) {
+    hideTextLoading();
+    addStoryBlock(`[Error: ${err.message}]`);
+  }
+
+  isLoading = false;
+}
+
+function selectTextChoice(choice) {
+  if (isLoading) return;
+  document.querySelectorAll('#currentChoices .btn-choice').forEach(btn => btn.disabled = true);
+  const input = document.querySelector('#currentChoices .custom-choice-input');
+  if (input) input.disabled = true;
+  sendTextMessage(choice);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   VISUAL MODE — PARSING & RENDERING
+   ═══════════════════════════════════════════════════════════════ */
+
+function parseVisualResponse(text) {
+  let background = 'default';
+  let character = 'none';
+  let speaker = '';
+  const choices = [];
+
+  // Extract tags
+  const bgMatch = text.match(/\[BACKGROUND:\s*(\w+)\]/i);
+  if (bgMatch) background = bgMatch[1].toLowerCase();
+
+  const charMatch = text.match(/\[CHARACTER:\s*(\w+)\]/i);
+  if (charMatch) character = charMatch[1].toLowerCase();
+
+  const speakerMatch = text.match(/\[SPEAKER:\s*([^\]]+)\]/i);
+  if (speakerMatch) speaker = speakerMatch[1].trim();
+
+  // Remove tags from text
+  let narrative = text
+    .replace(/\[BACKGROUND:[^\]]*\]/gi, '')
+    .replace(/\[CHARACTER:[^\]]*\]/gi, '')
+    .replace(/\[SPEAKER:[^\]]*\]/gi, '')
+    .trim();
+
+  // Extract choices from end
+  const lines = narrative.split('\n');
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const trimmed = lines[i].trim();
+    if (trimmed.startsWith('>') && trimmed.length > 1) {
+      choices.unshift(trimmed.slice(1).trim());
+      lines.pop();
+    } else if (trimmed === '') {
+      lines.pop();
+    } else {
+      break;
+    }
+  }
+
+  narrative = lines.join('\n').trim();
+
+  return { background, character, speaker, narrative, choices };
+}
+
+function setVisualBackground(tag) {
+  const bgEl = document.getElementById('visualBg');
+  const fallbackEl = document.getElementById('visualBgFallback');
+
+  // Try loading from Assets/backgrounds/
+  const img = new Image();
+  img.onload = () => {
+    bgEl.style.backgroundImage = `url(${img.src})`;
+    fallbackEl.style.background = 'none';
+  };
+  img.onerror = () => {
+    bgEl.style.backgroundImage = 'none';
+    fallbackEl.style.background = BG_FALLBACKS[tag] || BG_FALLBACKS.default;
+  };
+  img.src = `Assets/backgrounds/${tag}.png`;
+}
+
+function setVisualCharacter(tag) {
+  const charEl = document.getElementById('visualCharacter');
+  if (tag === 'none') {
+    charEl.style.display = 'none';
+    return;
+  }
+
+  const img = new Image();
+  img.onload = () => {
+    charEl.src = img.src;
+    charEl.style.display = 'block';
+  };
+  img.onerror = () => {
+    charEl.style.display = 'none';
+  };
+  img.src = `Assets/characters/${tag}.png`;
+}
+
+function addVisualChoices(choices) {
+  const container = document.getElementById('visualChoices');
+  container.innerHTML = '';
+
+  choices.forEach(choice => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-choice';
+    btn.textContent = choice;
+    btn.onclick = () => selectVisualChoice(choice);
+    container.appendChild(btn);
+  });
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'custom-choice-input';
+  input.placeholder = 'Type your own';
+  input.onkeydown = (e) => { if (e.key === 'Enter' && input.value.trim()) selectVisualChoice(input.value.trim()); };
+  container.appendChild(input);
+}
+
+function showVisualLoading() {
+  const container = document.getElementById('visualChoices');
+  container.innerHTML = '<div class="visual-loading" id="visualLoading"><span></span><span></span><span></span></div>';
+}
+
+function hideVisualLoading() {
+  const el = document.getElementById('visualLoading');
+  if (el) el.remove();
+}
+
+async function sendVisualMessage(playerChoice) {
+  if (isLoading) return;
+  isLoading = true;
+
+  if (playerChoice) {
+    histories.visual.push({ role: 'user', content: playerChoice });
+  } else {
+    histories.visual.push({ role: 'user', content: 'Begin the story. Set the opening scene.' });
+  }
+
+  showVisualLoading();
+
+  try {
+    const responseText = await callClaude(histories.visual);
+    hideVisualLoading();
+    histories.visual.push({ role: 'assistant', content: responseText });
+
+    const { background, character, speaker, narrative, choices } = parseVisualResponse(responseText);
+
+    setVisualBackground(background);
+    setVisualCharacter(character);
+    document.getElementById('visualCharName').textContent = speaker;
+    document.getElementById('visualText').innerHTML = renderStoryText(narrative);
+
+    if (choices.length > 0) addVisualChoices(choices);
+  } catch (err) {
+    hideVisualLoading();
+    document.getElementById('visualText').textContent = `[Error: ${err.message}]`;
+  }
+
+  isLoading = false;
+}
+
+function selectVisualChoice(choice) {
+  if (isLoading) return;
+  document.querySelectorAll('#visualChoices .btn-choice').forEach(btn => btn.disabled = true);
+  const input = document.querySelector('#visualChoices .custom-choice-input');
+  if (input) input.disabled = true;
+  sendVisualMessage(choice);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CHAT MODE — RENDERING & LOGIC
+   ═══════════════════════════════════════════════════════════════ */
+
+function addChatBubble(text, isMe) {
+  const container = document.getElementById('chatMessages');
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble ' + (isMe ? 'me' : 'them');
+  if (!isMe) {
+    const name = document.createElement('span');
+    name.className = 'bubble-name';
+    name.textContent = 'Aiden';
+    bubble.appendChild(name);
+  }
+  const content = document.createTextNode(text);
+  bubble.appendChild(content);
+  container.appendChild(bubble);
+  scrollContainer(container);
+}
+
+function showChatTyping() {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-typing';
+  div.id = 'chatTyping';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  container.appendChild(div);
+  scrollContainer(container);
+}
+
+function hideChatTyping() {
+  const el = document.getElementById('chatTyping');
+  if (el) el.remove();
+}
+
+async function sendChatMessage(playerText) {
+  if (isLoading) return;
+  isLoading = true;
+
+  const input = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('chatSendBtn');
+  input.disabled = true;
+  sendBtn.disabled = true;
+
+  if (playerText) {
+    addChatBubble(playerText, true);
+    histories.chat.push({ role: 'user', content: playerText });
+  } else {
+    histories.chat.push({ role: 'user', content: '[Sienna has just opened the chat. Send your first message to her.]' });
+  }
+
+  showChatTyping();
+
+  try {
+    const responseText = await callClaude(histories.chat);
+    hideChatTyping();
+    histories.chat.push({ role: 'assistant', content: responseText });
+    addChatBubble(responseText, false);
+  } catch (err) {
+    hideChatTyping();
+    addChatBubble(`[Error: ${err.message}]`, false);
+  }
+
+  input.disabled = false;
+  sendBtn.disabled = false;
+  input.value = '';
+  input.focus();
+  isLoading = false;
+}
+
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text || isLoading) return;
+  sendChatMessage(text);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILITIES
+   ═══════════════════════════════════════════════════════════════ */
+
+function scrollContainer(container) {
+  requestAnimationFrame(() => {
+    container.scrollTop = container.scrollHeight;
+  });
+}
+</script>
+
+</body>
+</html>
