@@ -366,6 +366,64 @@ html, body {
   box-shadow: none;
 }
 
+/* ───────────────────────── STORY INTRO CARD ───────────────────────── */
+.story-intro {
+  max-width: 700px;
+  margin: 0 auto 2.5rem;
+  text-align: center;
+  animation: fadeIn 0.6s ease;
+}
+
+.story-intro-img {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  margin-bottom: 1.2rem;
+}
+
+.story-intro-title {
+  font-size: 1.4rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.6rem;
+}
+
+.story-intro-desc {
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  padding: 0 1rem;
+}
+
+.story-intro-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+}
+
+.story-intro-tag {
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  padding: 0.3rem 0.7rem;
+  border-radius: 2px;
+}
+
+.story-intro-divider {
+  width: 60px;
+  height: 1px;
+  background: var(--border);
+  margin: 0 auto;
+}
+
 .custom-choice-input {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -579,23 +637,56 @@ html, body {
 .chat-messages::-webkit-scrollbar-track { background: transparent; }
 .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
+.chat-row {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  animation: fadeIn 0.3s ease;
+}
+.chat-row.them { align-self: flex-start; }
+.chat-row.me { align-self: flex-end; flex-direction: row-reverse; }
+
+.chat-msg-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+.chat-msg-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.chat-row.me .chat-msg-avatar {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
 .chat-bubble {
-  max-width: 75%;
+  max-width: 70%;
   padding: 0.75rem 1rem;
   font-size: 0.92rem;
   line-height: 1.55;
-  animation: fadeIn 0.3s ease;
   white-space: pre-wrap;
 }
-.chat-bubble.them {
-  align-self: flex-start;
+.chat-row.them .chat-bubble {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 2px 12px 12px 12px;
   color: var(--text-primary);
 }
-.chat-bubble.me {
-  align-self: flex-end;
+.chat-row.me .chat-bubble {
   background: var(--accent);
   border-radius: 12px 2px 12px 12px;
   color: var(--text-primary);
@@ -736,7 +827,7 @@ html, body {
 <!-- ═══════════════════════ TEXT NARRATIVE ═══════════════════════ -->
 <div id="gameText" class="screen">
   <div class="game-header">
-    <h3>The Millennium Wolves</h3>
+    <h3 onclick="showScreen('splash')" style="cursor:pointer">The Millennium Wolves</h3>
     <button class="btn-restart" onclick="restartGame()">Restart</button>
   </div>
   <div class="story-scroll" id="storyScroll"></div>
@@ -745,7 +836,7 @@ html, body {
 <!-- ═══════════════════════ VISUAL NARRATIVE ═══════════════════════ -->
 <div id="gameVisual" class="screen">
   <div class="game-header">
-    <h3>The Millennium Wolves</h3>
+    <h3 onclick="showScreen('splash')" style="cursor:pointer">The Millennium Wolves</h3>
     <button class="btn-restart" onclick="restartGame()">Restart</button>
   </div>
   <div class="visual-scene">
@@ -762,12 +853,8 @@ html, body {
 
 <!-- ═══════════════════════ CHAT MODE ═══════════════════════ -->
 <div id="gameChat" class="screen">
-  <div class="chat-header">
-    <div class="chat-avatar" id="chatAvatar">A</div>
-    <div class="chat-header-info">
-      <div class="chat-header-name">Aiden Norwood</div>
-      <div class="chat-header-status">Online</div>
-    </div>
+  <div class="game-header">
+    <h3 onclick="showScreen('splash')" style="cursor:pointer">The Millennium Wolves</h3>
     <button class="btn-restart" onclick="restartGame()">Restart</button>
   </div>
   <div class="chat-messages" id="chatMessages"></div>
@@ -1028,7 +1115,24 @@ function startGame(mode) {
   histories[mode] = [];
 
   if (mode === 'text') {
-    document.getElementById('storyScroll').innerHTML = '';
+    const scroll = document.getElementById('storyScroll');
+    scroll.innerHTML = '';
+    // Add story intro card
+    const intro = document.createElement('div');
+    intro.className = 'story-intro';
+    intro.innerHTML = `
+      <img class="story-intro-img" src="Assets/The%20Millenium%20Wolves%20(Square).png" alt="The Millennium Wolves" />
+      <div class="story-intro-title">The Millennium Wolves</div>
+      <div class="story-intro-desc">You are Sienna, a 19-year-old she-wolf about to experience your first Millennium — the ancient mating season that comes once every thousand years. When the enigmatic Alpha catches your scent, everything changes.</div>
+      <div class="story-intro-tags">
+        <span class="story-intro-tag">Dark Romance</span>
+        <span class="story-intro-tag">Werewolf</span>
+        <span class="story-intro-tag">Fated Mates</span>
+        <span class="story-intro-tag">Interactive</span>
+      </div>
+      <div class="story-intro-divider"></div>
+    `;
+    scroll.appendChild(intro);
     showScreen('gameText');
     sendTextMessage(null);
   } else if (mode === 'visual') {
@@ -1041,7 +1145,24 @@ function startGame(mode) {
     showScreen('gameVisual');
     sendVisualMessage(null);
   } else if (mode === 'chat') {
-    document.getElementById('chatMessages').innerHTML = '';
+    const chatMsgs = document.getElementById('chatMessages');
+    chatMsgs.innerHTML = '';
+    // Add story intro card
+    const intro = document.createElement('div');
+    intro.className = 'story-intro';
+    intro.innerHTML = `
+      <img class="story-intro-img" src="Assets/The%20Millenium%20Wolves%20(Square).png" alt="The Millennium Wolves" />
+      <div class="story-intro-title">The Millennium Wolves</div>
+      <div class="story-intro-desc">Chat with Aiden Norwood, the enigmatic Alpha of the East Pack. The Millennium has begun — and he's just found your number.</div>
+      <div class="story-intro-tags">
+        <span class="story-intro-tag">Dark Romance</span>
+        <span class="story-intro-tag">Werewolf</span>
+        <span class="story-intro-tag">Fated Mates</span>
+        <span class="story-intro-tag">Chat</span>
+      </div>
+      <div class="story-intro-divider"></div>
+    `;
+    chatMsgs.appendChild(intro);
     document.getElementById('chatInput').value = '';
     showScreen('gameChat');
     sendChatMessage(null);
@@ -1390,17 +1511,41 @@ function selectVisualChoice(choice) {
 
 function addChatBubble(text, isMe) {
   const container = document.getElementById('chatMessages');
+
+  const row = document.createElement('div');
+  row.className = 'chat-row ' + (isMe ? 'me' : 'them');
+
+  // Avatar
+  const avatar = document.createElement('div');
+  avatar.className = 'chat-msg-avatar';
+  if (isMe) {
+    const img = new Image();
+    img.src = 'Assets/avatar-user.png';
+    img.alt = 'You';
+    img.onerror = () => { avatar.textContent = 'S'; };
+    avatar.appendChild(img);
+  } else {
+    const img = new Image();
+    img.src = 'Assets/avatar-aiden.png';
+    img.alt = 'Aiden';
+    img.onerror = () => { avatar.textContent = 'A'; };
+    avatar.appendChild(img);
+  }
+
+  // Bubble
   const bubble = document.createElement('div');
-  bubble.className = 'chat-bubble ' + (isMe ? 'me' : 'them');
+  bubble.className = 'chat-bubble';
   if (!isMe) {
     const name = document.createElement('span');
     name.className = 'bubble-name';
     name.textContent = 'Aiden';
     bubble.appendChild(name);
   }
-  const content = document.createTextNode(text);
-  bubble.appendChild(content);
-  container.appendChild(bubble);
+  bubble.appendChild(document.createTextNode(text));
+
+  row.appendChild(avatar);
+  row.appendChild(bubble);
+  container.appendChild(row);
   scrollContainer(container);
 }
 
