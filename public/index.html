@@ -162,9 +162,13 @@ html, body {
 /* ───────────────────────── ADMIN PANEL ───────────────────────── */
 #admin {
   flex-direction: column;
-  padding: 2.5rem;
+  padding: 2.5rem 1.5rem;
   gap: 1.5rem;
   background: var(--bg-dark);
+  max-width: 800px;
+  margin: 0 auto;
+  overflow-y: auto;
+  width: 100%;
 }
 
 #admin h2 {
@@ -173,6 +177,15 @@ html, body {
   color: var(--gold);
   letter-spacing: 0.1em;
   font-weight: 400;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
 }
 
 #admin label {
@@ -187,10 +200,11 @@ html, body {
 
 #admin textarea {
   width: 100%;
-  height: 35vh;
+  height: 28vh;
   background: var(--bg-input);
   color: var(--text-primary);
   border: 1px solid var(--border);
+  border-radius: 6px;
   padding: 1rem;
   font-family: var(--font-ui);
   font-size: 0.88rem;
@@ -214,15 +228,16 @@ html, body {
   font-size: 0.75rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 0.6rem 1.2rem;
+  padding: 0.7rem 1.4rem;
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
+  border-radius: 4px 4px 0 0;
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s;
 }
-.admin-tab:hover { color: var(--text-primary); }
+.admin-tab:hover { color: var(--text-primary); background: rgba(255,255,255,0.04); }
 .admin-tab.active {
   color: var(--gold);
   border-bottom-color: var(--gold);
@@ -242,8 +257,9 @@ html, body {
   font-size: 0.82rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 0.7rem 2rem;
+  padding: 0.75rem 2.2rem;
   border: 1px solid var(--border);
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -473,12 +489,31 @@ html, body {
 /* ───────────────────────── VISUAL NARRATIVE ───────────────────────── */
 #gameVisual {
   flex-direction: column;
-  background: var(--bg-dark);
+  background: #000;
+}
+
+#gameVisual .game-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background: transparent;
+  border-bottom: none;
+}
+#gameVisual .game-header h3 {
+  text-shadow: 0 1px 6px rgba(0,0,0,0.8);
+}
+#gameVisual .btn-restart {
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
+  border-color: rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.8);
 }
 
 .visual-scene {
-  flex: 1;
-  position: relative;
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -498,82 +533,182 @@ html, body {
   transition: background 0.8s ease;
 }
 
-.visual-character {
+/* ── Speaker unit (portrait + name + dialogue card together) ── */
+.visual-speaker {
   position: absolute;
-  bottom: 42%;
-  left: 50%;
-  transform: translateX(-50%);
-  max-height: 55%;
-  max-width: 40%;
-  object-fit: contain;
-  filter: drop-shadow(0 4px 20px rgba(0,0,0,0.5));
-  transition: opacity 0.5s ease;
-  z-index: 2;
-}
-
-.visual-dialogue-area {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
   z-index: 3;
-  background: linear-gradient(to bottom, transparent, rgba(10,10,15,0.9) 15%, rgba(10,10,15,0.97));
-  padding: 2rem 2rem 1.5rem;
-  min-height: 38%;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  align-items: center;
+  max-width: 50%;
+  animation: fadeInOnly 0.3s ease;
+}
+.visual-speaker.pos-left {
+  left: 4%;
+  align-items: flex-start;
+}
+.visual-speaker.pos-right {
+  right: 4%;
+  align-items: flex-end;
+}
+
+.visual-character-frame {
+  width: 170px;
+  height: 190px;
+  clip-path: polygon(50% 0%, 96% 12%, 100% 55%, 82% 96%, 50% 100%, 18% 96%, 0% 55%, 4% 12%);
+  background: linear-gradient(160deg, #a8d0e6, #7bb5d0, #5a9ab5, #7bb5d0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 6px 20px rgba(0,0,0,0.5));
+}
+
+.visual-character {
+  width: 160px;
+  height: 180px;
+  object-fit: cover;
+  clip-path: polygon(50% 0%, 96% 12%, 100% 55%, 82% 96%, 50% 100%, 18% 96%, 0% 55%, 4% 12%);
 }
 
 .visual-character-name {
+  background: rgba(25, 30, 50, 0.95);
+  color: #fff;
   font-family: var(--font-ui);
-  font-size: 0.78rem;
-  color: var(--gold);
+  font-size: 0.82rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  margin-bottom: 0.5rem;
+  letter-spacing: 0.18em;
+  padding: 0.45rem 2.5rem;
+  text-align: center;
+  border-radius: 8px 8px 0 0;
+  min-width: 130px;
+}
+.visual-character-name:empty { display: none; }
+
+.visual-dialogue-card {
+  background: rgba(255, 252, 245, 0.96);
+  border-radius: 16px;
+  padding: 1.4rem 1.5rem;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.35);
 }
 
 .visual-text {
-  font-size: 1rem;
-  line-height: 1.75;
-  color: var(--text-primary);
-  max-width: 700px;
-  margin-bottom: 1rem;
-  max-height: 20vh;
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #2a2a3a;
+  max-height: 28vh;
   overflow-y: auto;
 }
+.visual-text p {
+  margin-bottom: 0.6em;
+  color: #2a2a3a;
+}
 
+/* ── Narrator mode (no character) ── */
+.visual-narrator-text {
+  position: absolute;
+  bottom: 35%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  background: rgba(255, 252, 245, 0.96);
+  border-radius: 16px;
+  padding: 1.2rem 2rem;
+  max-width: 420px;
+  width: 85%;
+  text-align: center;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #2a2a3a;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+  animation: fadeInOnly 0.3s ease;
+}
+
+/* ── Tap zone (tap anywhere to advance) ── */
+.visual-tap-zone {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  cursor: pointer;
+}
+.visual-tap-zone.disabled {
+  pointer-events: none;
+}
+
+/* ── Choices (Choices-style buttons) ── */
 .visual-choices {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  width: 90%;
+  max-width: 500px;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  max-width: 700px;
 }
 
 .visual-choices .btn-choice {
-  padding: 0.7rem 1rem;
-  font-size: 0.88rem;
+  background: rgba(25, 30, 50, 0.92);
+  border: 1px solid rgba(160, 200, 230, 0.25);
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.8rem 1.2rem;
+  font-size: 0.9rem;
+  text-align: center;
+  backdrop-filter: blur(8px);
+  font-family: var(--font-ui);
+  letter-spacing: 0.02em;
+}
+.visual-choices .btn-choice:hover {
+  background: rgba(40, 50, 80, 0.95);
+  border-color: rgba(160, 200, 230, 0.5);
+  transform: none;
+  box-shadow: 0 0 15px rgba(160, 200, 230, 0.15);
 }
 
 .visual-choices .custom-choice-input {
-  padding: 0.7rem 1rem;
-  font-size: 0.88rem;
+  background: rgba(25, 30, 50, 0.92);
+  border: 1px solid rgba(160, 200, 230, 0.25);
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.8rem 1.2rem;
+  font-size: 0.9rem;
+  text-align: center;
+  backdrop-filter: blur(8px);
+  font-family: var(--font-ui);
+}
+.visual-choices .custom-choice-input::placeholder { color: rgba(255,255,255,0.35); font-style: italic; }
+.visual-choices .custom-choice-input:focus {
+  border-color: rgba(160, 200, 230, 0.5);
+  background: rgba(40, 50, 80, 0.95);
+  box-shadow: 0 0 15px rgba(160, 200, 230, 0.15);
 }
 
-.visual-loading {
+/* ── Floating loading dots overlay (no card) ── */
+.visual-loading-overlay {
+  position: absolute;
+  bottom: 35%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
   display: flex;
-  gap: 0.4rem;
-  padding: 1rem 0;
+  gap: 0.5rem;
 }
-.visual-loading span {
-  width: 6px; height: 6px;
-  background: var(--accent);
+.visual-loading-overlay span {
+  width: 8px; height: 8px;
+  background: rgba(255, 255, 255, 0.7);
   border-radius: 50%;
   animation: pulse 1.2s ease infinite;
 }
-.visual-loading span:nth-child(2) { animation-delay: 0.2s; }
-.visual-loading span:nth-child(3) { animation-delay: 0.4s; }
+.visual-loading-overlay span:nth-child(2) { animation-delay: 0.2s; }
+.visual-loading-overlay span:nth-child(3) { animation-delay: 0.4s; }
 
 /* ───────────────────────── CHAT MODE ───────────────────────── */
 #gameChat {
@@ -759,6 +894,10 @@ html, body {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+@keyframes fadeInOnly {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
 @keyframes pulse {
   0%, 100% { opacity: 0.3; transform: scale(0.85); }
   50%      { opacity: 1; transform: scale(1.1); }
@@ -794,12 +933,12 @@ html, body {
 <div id="admin" class="screen">
   <h2>Story Configuration</h2>
 
-  <div>
+  <div class="admin-section">
     <label for="storyBible">Story Bible (shared across all modes)</label>
     <textarea id="storyBible"></textarea>
   </div>
 
-  <div>
+  <div class="admin-section">
     <label>Game Instructions</label>
     <div class="admin-tabs">
       <button class="admin-tab active" onclick="switchAdminTab('text')">Text</button>
@@ -842,12 +981,18 @@ html, body {
   <div class="visual-scene">
     <div class="visual-bg" id="visualBg"></div>
     <div class="visual-bg-fallback" id="visualBgFallback"></div>
-    <img class="visual-character" id="visualCharacter" style="display:none" />
-    <div class="visual-dialogue-area">
+    <div class="visual-speaker" id="visualSpeaker" style="display:none">
+      <div class="visual-character-frame">
+        <img class="visual-character" id="visualCharacter" />
+      </div>
       <div class="visual-character-name" id="visualCharName"></div>
-      <div class="visual-text" id="visualText"></div>
-      <div class="visual-choices" id="visualChoices"></div>
+      <div class="visual-dialogue-card">
+        <div class="visual-text" id="visualText"></div>
+      </div>
     </div>
+    <div class="visual-narrator-text" id="visualNarrator" style="display:none"></div>
+    <div class="visual-choices" id="visualChoices"></div>
+    <div class="visual-tap-zone" id="visualTapZone" onclick="advanceVisual()"></div>
   </div>
 </div>
 
@@ -936,14 +1081,14 @@ Every response MUST end with exactly 2 or 3 choices for the player. Format choic
 Everything before the choices is narrative text. Do NOT number the choices. Do NOT add labels like "Choice 1:". Just use the ">" prefix. Each choice must be 10 words or fewer — keep them punchy and decisive.
 
 ## Pacing & Structure
-- **Opening**: Start with Sienna at a pack gathering on the eve of the Millennium. Let the player feel the tension in the air, the whispers, the anticipation. Introduce the setting through sensory details before any action.
+- **Opening**: Write exactly ONE short paragraph (3-5 sentences). Set the scene at the pack gathering on the eve of the Millennium — the bonfire, the tension, Aiden's eyes finding yours. Then immediately offer choices. Do NOT write multiple paragraphs for the opening.
 - **Early Game**: Focus on atmosphere, establishing relationships, and the first unsettling signs of the Season's pull. Let the player choose how Sienna responds — defiance, curiosity, fear, excitement.
 - **Mid Game**: Escalate the connection with Aiden through charged encounters. Introduce complications: Elder interference, a rival wolf's interest in Sienna, strange dreams about her parents.
 - **Late Game**: Build toward a climax involving the rival pack threat AND the revelation about Sienna's bloodline. Force the player to make hard choices between safety and desire, pack loyalty and personal truth.
 
 ## Narrative Rules
 - Write in second person ("You feel the heat rise...").
-- Keep each response to 3-5 paragraphs of rich, atmospheric prose.
+- For the FIRST response, write exactly ONE paragraph. After that, keep responses to 2-3 paragraphs.
 - Appeal to all senses — the smell of pine and smoke, the sound of howling in the distance, the feel of moonlight on skin.
 - Build romantic tension gradually. Use lingering glances, accidental touches, loaded silences.
 - Make Aiden magnetic but never fully predictable. He should surprise the player.
@@ -973,51 +1118,57 @@ Everything before the choices is narrative text. Do NOT number the choices. Do N
 /* ── Visual Mode Instructions ── */
 const DEFAULT_VISUAL_INSTRUCTIONS = `# Visual Novel Instructions for Claude
 
-You are the narrator for a visual novel experience set in "The Millennium Wolves" universe.
+You are the engine for a Choices-style visual novel. The player taps through one beat at a time.
 
-## Response Format (STRICT)
-Every response MUST follow this exact structure:
+## THE THREE LINE TYPES — every line MUST be exactly one of these:
 
-[BACKGROUND: tag_name]
-[CHARACTER: character_name]
-[SPEAKER: Character Name]
+### 1. NARRATION — scene-setting, actions, descriptions, inner thoughts
+[NARRATOR] The bonfire crackles in the clearing.
+- NO character portrait is shown. Text appears centered on screen.
+- Use for: scene descriptions, actions, transitions, thoughts, other characters' speech.
+- Keep to 5-15 words. One short sentence.
 
-Your narrative dialogue and description text here. Keep it to 2-3 short paragraphs maximum. Write in second person.
+### 2. YOU (Sienna) SPEAKING — only what she literally SAYS OUT LOUD
+[CHARACTER: sienna] "I don't think I should be here."
+- Her portrait appears on the LEFT. Dialogue card appears near her.
+- ONLY write the exact words she speaks aloud. Nothing else.
+- WRONG: [CHARACTER: sienna] You wipe your mouth and shout "Oh no!"
+- RIGHT: [CHARACTER: sienna] "Oh no!"
+- Actions/thoughts about Sienna go in [NARRATOR] lines instead.
 
-> Choice one (10 words max)
-> Choice two (10 words max)
-> Choice three (10 words max)
+### 3. AIDEN SPEAKING — only what he literally SAYS OUT LOUD
+[CHARACTER: aiden] "You shouldn't have come alone."
+- His portrait appears on the RIGHT. Dialogue card appears near him.
+- ONLY write the exact words he speaks aloud. Nothing else.
 
-## Background Tags (use ONLY these)
-- forest_night — dark woods, moonlit paths, mysterious atmosphere
-- forest_day — dappled sunlight through trees, nature
-- ballroom — grand pack hall, formal gatherings, ceremonies
-- bedroom — private chambers, intimate settings
-- bonfire — outdoor fire, pack celebrations, warmth
-- moonlight — open clearing under the moon, romantic
-- danger — threatening atmosphere, confrontations, red tones
-- intimate — close encounters, private moments
-- pack_estate — the Alpha's estate, corridors, formal rooms
+## EXAMPLE RESPONSE:
+[BACKGROUND: bonfire]
+[NARRATOR] The bonfire crackles. Wolves gather in the clearing.
+[NARRATOR] You pull your jacket tighter as the heat washes over you.
+[CHARACTER: aiden] "You came."
+[CHARACTER: sienna] "I didn't have a choice."
+[CHARACTER: aiden] "There's always a choice."
+[NARRATOR] His eyes lock onto yours. Something shifts in the air.
+> Hold his gaze
+> Look away
+> "What do you want from me?"
 
-## Character Tags (use ONLY these)
-- aiden — Alpha Aiden Norwood
-- michelle — Sienna's best friend
-- josh — Beta Josh
-- elder — Pack Elder
-- none — no character shown (landscape/atmosphere shots)
+## RULES
+- 3-4 beats per response, then choices. Keep it SHORT. Do not write more than 4 beats before offering choices.
+- [CHARACTER] lines contain ONLY spoken dialogue in quotes. Never actions or descriptions.
+- [NARRATOR] lines handle everything else: actions, descriptions, thoughts, scene-setting.
+- Choices go at the very end with > prefix. Include 2-3 per response.
+- Only two characters exist: sienna and aiden.
+- After the player makes a choice, do NOT have Sienna repeat or echo the choice. Start with Aiden's response or a narrator beat instead.
 
-## Writing Style
-- Short, punchy dialogue and description — this is visual, not a novel
-- Focus on what the player SEES: expressions, body language, setting details
-- Use dialogue more than prose. Format spoken lines with quotes.
-- Each scene should feel like a single panel/moment, not a long passage
-- Build tension through what's shown, not told
+## Background Tags
+forest_night, forest_day, ballroom, bedroom, bonfire, moonlight, danger, intimate, pack_estate
 
 ## Pacing
-- Start at the pack gathering on the eve of the Millennium
-- One clear scene per response — a single moment or exchange
-- Advance the story through small, meaningful beats
-- Let the visuals carry mood; keep text concise`;
+- IMPORTANT: Start IMMEDIATELY with dialogue between Sienna and Aiden. Do NOT open with narration — the scene is already set. Jump straight into the conversation.
+- The story is driven by dialogue. Narration is minimal — just enough to set the scene or describe a brief action between lines of dialogue.
+- Every response should be mostly dialogue between Sienna and Aiden, with narration lines used sparingly.
+- Start at the pack gathering on the eve of the Millennium. Aiden and Sienna meet right away.`;
 
 /* ── Chat Mode Instructions ── */
 const DEFAULT_CHAT_INSTRUCTIONS = `# Chat Mode Instructions for Claude
@@ -1069,6 +1220,12 @@ let isLoading = false;
     const saved = localStorage.getItem(key);
     return saved !== null ? saved : fallback;
   };
+
+  // Clear old-format visual instructions so new beat format takes effect
+  const storedVisual = localStorage.getItem('visualInstructions');
+  if (storedVisual && !storedVisual.includes('[NARRATOR]')) {
+    localStorage.removeItem('visualInstructions');
+  }
 
   document.getElementById('storyBible').value = load('storyBible', DEFAULT_STORY_BIBLE);
   document.getElementById('textInstructions').value = load('textInstructions', DEFAULT_TEXT_INSTRUCTIONS);
@@ -1136,14 +1293,27 @@ function startGame(mode) {
     showScreen('gameText');
     sendTextMessage(null);
   } else if (mode === 'visual') {
+    visualBeats = [];
+    visualBeatIndex = 0;
     document.getElementById('visualText').textContent = '';
     document.getElementById('visualChoices').innerHTML = '';
     document.getElementById('visualCharName').textContent = '';
-    document.getElementById('visualCharacter').style.display = 'none';
-    document.getElementById('visualBg').style.backgroundImage = 'none';
-    document.getElementById('visualBgFallback').style.background = BG_FALLBACKS.default;
+    document.getElementById('visualSpeaker').style.display = 'none';
+    // Load background + first narrator line immediately (no loading screen)
+    setVisualBackground('forest_night');
+    const narratorBox = document.getElementById('visualNarrator');
+    narratorBox.style.display = 'block';
+    narratorBox.textContent = 'The Millennium has begun. The bonfire crackles as wolves gather under the full moon.';
+    // Set up second hardcoded beat, then fetch from Claude
+    visualBeats = [
+      { type: 'narrator', text: 'The Millennium has begun. The bonfire crackles as wolves gather under the full moon.' },
+      { type: 'narrator', text: 'You feel the pull in your chest — ancient, undeniable.' }
+    ];
+    visualBeatIndex = 0;
+    document.getElementById('visualTapZone').classList.remove('disabled');
     showScreen('gameVisual');
-    sendVisualMessage(null);
+    // Fetch the rest from Claude in the background
+    sendVisualFirstMessage();
   } else if (mode === 'chat') {
     const chatMsgs = document.getElementById('chatMessages');
     chatMsgs.innerHTML = '';
@@ -1357,119 +1527,198 @@ function selectTextChoice(choice) {
    VISUAL MODE — PARSING & RENDERING
    ═══════════════════════════════════════════════════════════════ */
 
-function parseVisualResponse(text) {
-  let background = 'default';
-  let character = 'none';
-  let speaker = '';
-  const choices = [];
+/* ── Beat queue state ── */
+let visualBeats = [];
+let visualBeatIndex = 0;
 
-  // Extract tags
-  const bgMatch = text.match(/\[BACKGROUND:\s*(\w+)\]/i);
-  if (bgMatch) background = bgMatch[1].toLowerCase();
+const CHAR_DISPLAY_NAMES = {
+  'aiden': 'Aiden', 'sienna': 'You'
+};
 
-  const charMatch = text.match(/\[CHARACTER:\s*(\w+)\]/i);
-  if (charMatch) character = charMatch[1].toLowerCase();
+const CHAR_INFO = {
+  'aiden':  { src: 'Assets/avatar-aiden.png', pos: 'right' },
+  'sienna': { src: 'Assets/avatar-user.png',  pos: 'left' }
+};
 
-  const speakerMatch = text.match(/\[SPEAKER:\s*([^\]]+)\]/i);
-  if (speakerMatch) speaker = speakerMatch[1].trim();
+function parseVisualBeats(text) {
+  const beats = [];
+  let currentBg = null;
+  const lines = text.split('\n');
 
-  // Remove tags from text
-  let narrative = text
-    .replace(/\[BACKGROUND:[^\]]*\]/gi, '')
-    .replace(/\[CHARACTER:[^\]]*\]/gi, '')
-    .replace(/\[SPEAKER:[^\]]*\]/gi, '')
-    .trim();
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
 
-  // Extract choices from end
-  const lines = narrative.split('\n');
-  for (let i = lines.length - 1; i >= 0; i--) {
-    const trimmed = lines[i].trim();
-    if (trimmed.startsWith('>') && trimmed.length > 1) {
-      choices.unshift(trimmed.slice(1).trim());
-      lines.pop();
-    } else if (trimmed === '') {
-      lines.pop();
-    } else {
+    // Background tag — store for the next beat
+    const bgMatch = line.match(/^\[BACKGROUND:\s*(\w+)\]/i);
+    if (bgMatch) { currentBg = bgMatch[1].toLowerCase(); continue; }
+
+    // Choice line
+    if (line.startsWith('>') && line.length > 1) {
+      // Collect all remaining choices
+      const choices = [];
+      for (let j = i; j < lines.length; j++) {
+        const cl = lines[j].trim();
+        if (cl.startsWith('>') && cl.length > 1) choices.push(cl.slice(1).trim());
+      }
+      if (choices.length) beats.push({ type: 'choices', choices, background: currentBg });
       break;
     }
+
+    // Narrator beat
+    const narratorMatch = line.match(/^\[NARRATOR\]\s*(.*)/i);
+    if (narratorMatch) {
+      beats.push({ type: 'narrator', text: narratorMatch[1].trim(), background: currentBg });
+      currentBg = null;
+      continue;
+    }
+
+    // Character beat
+    const charMatch = line.match(/^\[CHARACTER:\s*(\w+)\]\s*(.*)/i);
+    if (charMatch) {
+      beats.push({ type: 'character', name: charMatch[1].toLowerCase(), text: charMatch[2].trim(), background: currentBg });
+      currentBg = null;
+      continue;
+    }
   }
-
-  narrative = lines.join('\n').trim();
-
-  return { background, character, speaker, narrative, choices };
+  return beats;
 }
 
 function setVisualBackground(tag) {
   const bgEl = document.getElementById('visualBg');
   const fallbackEl = document.getElementById('visualBgFallback');
-
-  // Try loading from Assets/backgrounds/
   const img = new Image();
-  img.onload = () => {
-    bgEl.style.backgroundImage = `url(${img.src})`;
-    fallbackEl.style.background = 'none';
-  };
+  img.onload = () => { bgEl.style.backgroundImage = `url(${img.src})`; fallbackEl.style.background = 'none'; };
   img.onerror = () => {
-    bgEl.style.backgroundImage = 'none';
-    fallbackEl.style.background = BG_FALLBACKS[tag] || BG_FALLBACKS.default;
+    const fb = new Image();
+    fb.onload = () => { bgEl.style.backgroundImage = `url(${fb.src})`; fallbackEl.style.background = 'none'; };
+    fb.onerror = () => { bgEl.style.backgroundImage = 'none'; fallbackEl.style.background = BG_FALLBACKS[tag] || BG_FALLBACKS.default; };
+    fb.src = 'Assets/background-forest.png';
   };
-  img.src = `Assets/backgrounds/${tag}.png`;
+  img.src = `Assets/background-${tag}.png`;
 }
 
 function setVisualCharacter(tag) {
+  const speakerEl = document.getElementById('visualSpeaker');
   const charEl = document.getElementById('visualCharacter');
-  if (tag === 'none') {
-    charEl.style.display = 'none';
-    return;
-  }
-
+  if (!tag || tag === 'none') { speakerEl.style.display = 'none'; return; }
+  const info = CHAR_INFO[tag] || CHAR_INFO['aiden'];
+  speakerEl.className = 'visual-speaker pos-' + info.pos;
   const img = new Image();
-  img.onload = () => {
-    charEl.src = img.src;
-    charEl.style.display = 'block';
-  };
-  img.onerror = () => {
-    charEl.style.display = 'none';
-  };
-  img.src = `Assets/characters/${tag}.png`;
+  img.onload = () => { charEl.src = img.src; speakerEl.style.display = 'flex'; };
+  img.onerror = () => { speakerEl.style.display = 'none'; };
+  img.src = info.src;
 }
 
-function addVisualChoices(choices) {
-  const container = document.getElementById('visualChoices');
-  container.innerHTML = '';
+function showVisualBeat(beat) {
+  const speakerEl = document.getElementById('visualSpeaker');
+  const narratorBox = document.getElementById('visualNarrator');
+  const tapZone = document.getElementById('visualTapZone');
+  const choicesEl = document.getElementById('visualChoices');
 
-  choices.forEach(choice => {
-    const btn = document.createElement('button');
-    btn.className = 'btn-choice';
-    btn.textContent = choice;
-    btn.onclick = () => selectVisualChoice(choice);
-    container.appendChild(btn);
-  });
+  choicesEl.innerHTML = '';
 
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.className = 'custom-choice-input';
-  input.placeholder = 'Type your own';
-  input.onkeydown = (e) => { if (e.key === 'Enter' && input.value.trim()) selectVisualChoice(input.value.trim()); };
-  container.appendChild(input);
+  if (beat.background) setVisualBackground(beat.background);
+
+  if (beat.type === 'narrator') {
+    // Narration: centered, no portrait, no name
+    speakerEl.style.display = 'none';
+    narratorBox.style.display = 'block';
+    narratorBox.textContent = beat.text;
+    tapZone.classList.remove('disabled');
+  } else if (beat.type === 'character') {
+    // Dialogue: portrait + name + card all together, positioned near speaker
+    narratorBox.style.display = 'none';
+    setVisualCharacter(beat.name);
+    document.getElementById('visualCharName').textContent = beat.name === 'sienna' ? 'You' : (CHAR_DISPLAY_NAMES[beat.name] || beat.name);
+    document.getElementById('visualText').textContent = beat.text;
+    tapZone.classList.remove('disabled');
+  } else if (beat.type === 'choices') {
+    tapZone.classList.add('disabled');
+    // Keep current scene visible, show choices
+    beat.choices.forEach(choice => {
+      const btn = document.createElement('button');
+      btn.className = 'btn-choice';
+      btn.textContent = choice;
+      btn.onclick = () => selectVisualChoice(choice);
+      choicesEl.appendChild(btn);
+    });
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'custom-choice-input';
+    input.placeholder = 'Type your own';
+    input.onkeydown = (e) => { if (e.key === 'Enter' && input.value.trim()) selectVisualChoice(input.value.trim()); };
+    choicesEl.appendChild(input);
+  }
+}
+
+function advanceVisual() {
+  visualBeatIndex++;
+  if (visualBeatIndex < visualBeats.length) {
+    showVisualBeat(visualBeats[visualBeatIndex]);
+  } else {
+    // Waiting for Claude — show loading
+    showVisualLoading();
+    waitForVisualBeats();
+  }
+}
+
+function waitForVisualBeats() {
+  if (visualBeatIndex < visualBeats.length) {
+    showVisualBeat(visualBeats[visualBeatIndex]);
+  } else {
+    setTimeout(waitForVisualBeats, 200);
+  }
 }
 
 function showVisualLoading() {
-  const container = document.getElementById('visualChoices');
-  container.innerHTML = '<div class="visual-loading" id="visualLoading"><span></span><span></span><span></span></div>';
+  document.getElementById('visualSpeaker').style.display = 'none';
+  document.getElementById('visualNarrator').style.display = 'none';
+  document.getElementById('visualTapZone').classList.add('disabled');
+  // Create floating dots overlay (no card)
+  let overlay = document.getElementById('visualLoadingOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.className = 'visual-loading-overlay';
+    overlay.id = 'visualLoadingOverlay';
+    overlay.innerHTML = '<span></span><span></span><span></span>';
+    document.querySelector('.visual-scene').appendChild(overlay);
+  }
+  overlay.style.display = 'flex';
 }
 
 function hideVisualLoading() {
-  const el = document.getElementById('visualLoading');
-  if (el) el.remove();
+  const overlay = document.getElementById('visualLoadingOverlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+async function sendVisualFirstMessage() {
+  // Fetch Claude's first response in the background while player taps hardcoded beats
+  const openingNarration = visualBeats.map(b => `[NARRATOR] ${b.text}`).join('\n');
+  histories.visual.push({ role: 'user', content: 'Begin the story.' });
+  histories.visual.push({ role: 'assistant', content: `[BACKGROUND: forest_night]\n${openingNarration}` });
+  histories.visual.push({ role: 'user', content: 'Continue. Aiden speaks ONE line to Sienna, then immediately give 2-3 choices. Only 1 beat before choices.' });
+
+  try {
+    const responseText = await callClaude(histories.visual);
+    histories.visual.push({ role: 'assistant', content: responseText });
+    const newBeats = parseVisualBeats(responseText);
+    // Append Claude's beats after the hardcoded ones
+    visualBeats = visualBeats.concat(newBeats);
+  } catch (err) {
+    visualBeats.push({ type: 'narrator', text: `[Error: ${err.message}]` });
+  }
 }
 
 async function sendVisualMessage(playerChoice) {
   if (isLoading) return;
   isLoading = true;
 
+  document.getElementById('visualChoices').innerHTML = '';
+  document.getElementById('visualTapZone').classList.add('disabled');
+
   if (playerChoice) {
-    histories.visual.push({ role: 'user', content: playerChoice });
+    histories.visual.push({ role: 'user', content: playerChoice + '\n(Do NOT echo this choice back as Sienna speaking. Start directly with Aiden responding or a narrator beat.)' });
   } else {
     histories.visual.push({ role: 'user', content: 'Begin the story. Set the opening scene.' });
   }
@@ -1481,17 +1730,16 @@ async function sendVisualMessage(playerChoice) {
     hideVisualLoading();
     histories.visual.push({ role: 'assistant', content: responseText });
 
-    const { background, character, speaker, narrative, choices } = parseVisualResponse(responseText);
+    visualBeats = parseVisualBeats(responseText);
+    visualBeatIndex = 0;
 
-    setVisualBackground(background);
-    setVisualCharacter(character);
-    document.getElementById('visualCharName').textContent = speaker;
-    document.getElementById('visualText').innerHTML = renderStoryText(narrative);
-
-    if (choices.length > 0) addVisualChoices(choices);
+    if (visualBeats.length > 0) {
+      showVisualBeat(visualBeats[0]);
+    }
   } catch (err) {
     hideVisualLoading();
-    document.getElementById('visualText').textContent = `[Error: ${err.message}]`;
+    document.getElementById('visualNarrator').style.display = 'block';
+    document.getElementById('visualNarrator').textContent = `[Error: ${err.message}]`;
   }
 
   isLoading = false;
